@@ -664,7 +664,6 @@ tr:hover td{background:rgba(0,0,0,0.015)}
     </div>
     <div class="sess-items">
       <div class="nav-item s3" onclick="goTo('mod11')" id="nav11"><span class="nav-num">10</span><span class="nav-label">Goal Setting</span><span class="nav-check" id="chk11">✓</span></div>
-      <div class="nav-item s3" onclick="goTo('mod9')" id="nav9"><span class="nav-num">11</span><span class="nav-label">Website Strive</span><span class="nav-check" id="chk9">✓</span></div>
     </div>
   </div>
 </div>
@@ -2294,35 +2293,7 @@ tr:hover td{background:rgba(0,0,0,0.015)}
     </div>
   </div>
 
-<!-- MOD 9: WEBSITE STRIVE -->
-  <div class="module" id="mod9">
-    <div class="module-header">
-      <div><div class="module-tag s2">💻 Command Center</div><h2>Website Strive</h2><div class="module-sub">Platform internal untuk planning, scheduling, dan tracking activity harian</div></div>
-      <button class="btn-done" id="done9" onclick="markDone(9)">Tandai Selesai</button>
-    </div>
-    <div class="card card-blue" style="margin-bottom:14px">
-      <h4>🔗 Link Akses</h4>
-      <p style="margin-top:4px"><a href="https://theignitex.com/home" target="_blank" style="color:var(--blue);font-weight:700;font-size:14px">https://theignitex.com/home</a></p>
-      <p style="margin-top:6px">Simpan sebagai shortcut di HP dan buka setiap hari.</p>
-    </div>
-    <div class="onboard-grid">
-      <div class="onboard-card"><div class="oc-icon">🎯</div><div class="oc-title">Planning</div><p>Rencanakan target P1, P2, dan closing per minggu/bulan</p></div>
-      <div class="onboard-card"><div class="oc-icon">📅</div><div class="oc-title">Scheduling</div><p>Atur jadwal pertemuan dengan prospek</p></div>
-      <div class="onboard-card"><div class="oc-icon">📊</div><div class="oc-title">Tracking</div><p>Pantau progress activity harian kamu</p></div>
-      <div class="onboard-card"><div class="oc-icon">🔍</div><div class="oc-title">Accountability</div><p>Leader bisa lihat progress setiap agent</p></div>
-    </div>
-    <hr class="divider">
-    <h3>📋 Cara Pakai — 4 Steps</h3>
-    <div style="display:flex;flex-direction:column;gap:7px;margin-top:10px">
-      <div class="card card-blue" style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;background:var(--blue);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">1</div><div><h4>Akses website</h4><p>Buka theignitex.com/home, simpan sebagai shortcut di HP</p></div></div>
-      <div class="card card-blue" style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;background:var(--blue);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">2</div><div><h4>Input target mingguan</h4><p>Awal setiap minggu: berapa P1, P2, dan target closing yang direncanakan</p></div></div>
-      <div class="card card-blue" style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;background:var(--blue);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">3</div><div><h4>Update activity harian</h4><p>Setiap hari update P1 yang sudah dilakukan dan status prospek</p></div></div>
-      <div class="card card-blue" style="display:flex;gap:12px;align-items:flex-start"><div style="width:26px;height:26px;background:var(--blue);border-radius:50%;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:12px;flex-shrink:0">4</div><div><h4>Review dengan leader</h4><p>Leader pakai data ini saat coaching mingguan — pastikan selalu update</p></div></div>
-    </div>
-    <div class="quote-block"><p>"Website ini bukan untuk mengawasi kamu. Ini untuk membantu kamu lihat sendiri apakah kamu on-track atau tidak."</p></div>
-  </div>
-
-  <!-- MOD 10: KONTES PECAH TELOR -->
+<!-- MOD 10: KONTES PECAH TELOR -->
   <div class="module" id="mod10">
     <div class="module-header">
       <div><div class="module-tag s2">🥚 First Closing</div><h2>Kontes Pecah Telor</h2><div class="module-sub">Bonus tambahan untuk closing pertama — berlaku sekarang</div></div>
@@ -2371,7 +2342,8 @@ let done=JSON.parse(localStorage.getItem('alj_done')||'{}');
 let agentName=localStorage.getItem('alj_name')||'';
 let p1List=JSON.parse(localStorage.getItem('alj_p1list')||'[]');
 let curSlide=0;
-const TOTAL_MODS=12;
+const TOTAL_MODS=11;
+const MAX_MOD_IDX=12; // indeks 0..11, indeks 9 (Website) dihapus di Strive
 
 
 // ── Agent mode: link unik per agent + sync database ──
@@ -2445,7 +2417,7 @@ function buildState(){
 }
 function restoreState(s){
   try{
-    if(s.done){done=Object.assign({},done,s.done);localStorage.setItem('alj_done',JSON.stringify(done));for(var i=0;i<TOTAL_MODS;i++){if(done[i])applyDone(i);}updateProgress();}
+    if(s.done){done=Object.assign({},done,s.done);localStorage.setItem('alj_done',JSON.stringify(done));for(var i=0;i<MAX_MOD_IDX;i++){if(done[i])applyDone(i);}updateProgress();}
     var g=s.gs||{};
     if(g.goals)Object.keys(g.goals).forEach(function(k){
       if(gsGoals[k]===undefined&&gsGoalDefs[k])gsToggleGoal(k);
@@ -2472,7 +2444,7 @@ function restoreState(s){
 
 window.onload=function(){
   if(agentName){document.getElementById('name-input').value=agentName;document.getElementById('sb-agent').textContent='👋 '+agentName;}
-  for(let i=0;i<TOTAL_MODS;i++){if(done[i])applyDone(i);}
+  for(let i=0;i<MAX_MOD_IDX;i++){if(done[i])applyDone(i);}
   updateProgress();
   initSlideshow();
   renderP1List();
@@ -2486,20 +2458,20 @@ function markDone(i){done[i]=true;localStorage.setItem('alj_done',JSON.stringify
 function applyDone(i){let b=document.getElementById('done'+i);if(b){b.textContent='✅ Selesai';b.classList.add('done');}let c=document.getElementById('chk'+i);if(c)c.classList.add('done');}
 
 function updateProgress(){
-  let total=Object.values(done).filter(Boolean).length;
+  let total=Object.keys(done).filter(function(k){return k!=='9'&&done[k];}).length;
   let s0=0,s1=0,s2=0,s3=0;
   if(done[0])s0++;
   for(let i=1;i<=5;i++){if(done[i])s1++;}
   for(let i=6;i<=8;i++){if(done[i])s2++;}
   if(done[10])s2++;
-  // s3: mod11(key 11), mod9(key 9)
-  if(done[11])s3++;if(done[9])s3++;
+  // s3: hanya Goal Setting (key 11) — modul Website dihapus di Strive
+  if(done[11])s3++;
   document.getElementById('prog-bar').style.width=Math.round(total/TOTAL_MODS*100)+'%';
   document.getElementById('prog-text').textContent=total+' dari '+TOTAL_MODS+' modul selesai';
   document.getElementById('sc0-count').textContent=s0+'/1';
   document.getElementById('sc1-count').textContent=s1+'/5';
   document.getElementById('sc2-count').textContent=s2+'/4';
-  document.getElementById('sc3-count').textContent=s3+'/2';
+  document.getElementById('sc3-count').textContent=s3+'/1';
   if(total===TOTAL_MODS)document.getElementById('completion-banner').classList.add('show');
 }
 
