@@ -1,0 +1,7 @@
+{
+  "name": "strive-agents-learning-journey",
+  "private": true,
+  "dependencies": {
+    "@vercel/blob": "^2.4.0"
+  }
+}
