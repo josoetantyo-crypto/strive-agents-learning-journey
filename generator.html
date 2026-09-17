@@ -95,6 +95,7 @@ h1{font-size:20px;font-weight:800;margin-bottom:4px}
   <div class="card" id="admin-area" style="display:none">
     <h2>👥 Daftar Agent <span class="refresh" onclick="loadAgents()">↻ Refresh</span></h2>
     <div id="agent-list"><div class="empty">Memuat...</div></div>
+    <div class="note" id="mig-note" style="display:none;color:#92400E;background:#FFFBEB;border:1.5px solid #D97706;border-radius:9px;padding:9px 12px;margin:0 0 10px">⏳ Agent lama sedang dipindahkan ke database baru dan akan muncul lagi otomatis paling lambat 5 Okt 2026. Link lama tetap bisa dibuka agent. <a style="color:inherit;font-weight:700;cursor:pointer" onclick="loadAgents(true)">Cek sekarang</a></div>
     <div class="note">Kolom P1 = jumlah nama yang sudah <strong>dicentang ketemu</strong> / total nama di list. Data live dari database — refresh untuk update terbaru.</div>
   </div>
 </div>
@@ -134,12 +135,14 @@ async function generate(){
   btn.disabled=false;btn.textContent='Generate Link';
 }
 
-async function loadAgents(){
+async function loadAgents(forceMigrate){
   const box=document.getElementById('agent-list');
   try{
-    const r=await fetch(API+'/agents',{headers:admHeaders()});
+    const r=await fetch(API+'/agents'+(forceMigrate===true?'?migrate=1':''),{headers:admHeaders()});
     const d=await r.json();
     if(!r.ok)throw new Error(d.error||'Gagal memuat');
+    const note=document.getElementById('mig-note');
+    if(note)note.style.display=d.migrated===false?'block':'none';
     if(!d.agents.length){box.innerHTML='<div class="empty">Belum ada agent. Generate link pertama di atas! 🚀</div>';return;}
     box.innerHTML=d.agents.map(a=>{
       const link=DASH+'?agent='+a.id;
@@ -158,7 +161,8 @@ async function loadAgents(){
 
 async function delAgent(id,name){
   if(!confirm('Hapus agent "'+name+'"? Data P1-nya ikut terhapus.'))return;
-  await fetch(API+'/agents?id='+id,{method:'DELETE',headers:admHeaders()});
+  const r=await fetch(API+'/agents?id='+id,{method:'DELETE',headers:admHeaders()});
+  if(!r.ok){const d=await r.json().catch(()=>({}));toast('⚠️ '+(d.error||'Gagal menghapus'));return;}
   toast('Agent dihapus');
   loadAgents();
 }
@@ -174,7 +178,8 @@ async function unlockAdmin(){
   const err=document.getElementById('adm-err');
   err.style.display='none';
   if(!pass)return;
-  const r=await fetch(API+'/agents',{headers:{'X-Admin-Key':pass}});
+  const r=await fetch(API+'/agents',{headers:{'X-Admin-Key':pass}}).catch(()=>({status:0}));
+  if(r.status===0){err.textContent='⚠️ Server tidak bisa dihubungi, coba lagi.';err.style.display='block';return;}
   if(r.status===401){err.textContent='⚠️ Password salah.';err.style.display='block';return;}
   ADMIN_KEY=pass;sessionStorage.setItem('adm_key',pass);
   document.getElementById('admin-lock').style.display='none';
@@ -183,8 +188,8 @@ async function unlockAdmin(){
 }
 if(ADMIN_KEY){unlockAdmin0();}
 async function unlockAdmin0(){
-  const r=await fetch(API+'/agents',{headers:admHeaders()});
-  if(r.ok){document.getElementById('admin-lock').style.display='none';document.getElementById('admin-area').style.display='block';loadAgents();}
+  const r=await fetch(API+'/agents',{headers:admHeaders()}).catch(()=>({ok:false,status:0}));
+  if(r.ok||r.status!==401){document.getElementById('admin-lock').style.display='none';document.getElementById('admin-area').style.display='block';loadAgents();}
   else{sessionStorage.removeItem('adm_key');ADMIN_KEY='';}
 }
 </script>
